@@ -1,242 +1,144 @@
 
 import Header from "./components/Header"
+import Album from "./components/Album"
+
+import{ useState, useEffect} from 'react'
+import {db} from './data/db'
 
 function App() {  //recordar q la funcion App es un componente de react
   
-  return (
-    <>  {/*esto es un fragmento de react en el que se pone todo el JSX*/}
+  //  ANTES DEL return() VA EL CODIGO EN JAVASCRIPT
+   const initialCart=() => {
+    const localStorageCart=localStorage.getItem('cart')
+    return localStorageCart ? JSON.parse(localStorageCart) : []  //si localstoragecart tiene algo, lo convierto de string a array con parse, y si no, devuelvo el arreglo vacio
+  }
+
+
+  const[data,setData]=useState(db)   // inicio el state con el array db localizado en db.js
+  const[cart,setCart]=useState(initialCart) //lo inicio con el contenido guardado en localStorage
+
+
+  useEffect( () => {
+    localStorage.setItem('cart', JSON.stringify(cart)) //localstorage no permite objetos o arrays asiq lo paso a string
+  }, [cart]) //cada vez que cart cambie ejecutar el codigo ese
+
+  function addToCart(item){
+
+      const itemExists=cart.findIndex( (album) => album.id ===item.id)  //este metodo no muta el array, y compruebo que el id del item sea igual al del estado album. Devuelve -1 si el elemnto no se ha añadido al carrito aun, y sino devuelve el indice del primer elemento q cumple la condicion
       
-      <h1>Golden Record</h1>
-      <h3>An app by Mario Sulé</h3>
+      if(itemExists>=0){
+        console.log("Este elemento ya existe en el carrito")
+        
+        const copiaCart=[...cart] //tomo una copia del carrito
+        copiaCart[itemExists].quantity++  //aumento la cantidad en el album cuyo indice sea usando una copia para no modificar el estado de cart
+        setCart( copiaCart )  //siempre q escriba en mi carrito tengo que setearlo, OJO que no hay corchetes
 
-      <Header />
-      <header class="py-5 header">
-          <div class="container-xl">
-              <div class="row justify-content-center justify-content-md-between">
-                  <div class="col-8 col-md-3">
-                      <a href="index.html">
-                          <img class="img-fluid" src="./public/img/logo.svg" alt="imagen logo" />
-                      </a>
-                  </div>
-                  <nav class="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
-                      <div 
-                          class="carrito"
-                      >
-                          <img class="img-fluid" src="./public/img/carrito.png" alt="imagen carrito" />
+      } else{
+        console.log("agregando item al carrito...")
+        item.quantity=1
+        setCart( [...cart, item] ) // llamo a la funcion setCart q modifica el estado cart, la cual añade a lo q hay en carrito el album al que has hecho click
+        //con los corchetes devuelvo un array, sino estuviesen estaria devolviendo un objeto ya que item (album) es un objeto. asiq lo convierto a un array
+      } 
 
-                          <div id="carrito" class="bg-white p-3">
-                              <p class="text-center">El carrito esta vacio</p>
-                              <table class="w-100 table">
-                                  <thead>
-                                      <tr>
-                                          <th>Imagen</th>
-                                          <th>Nombre</th>
-                                          <th>Precio</th>
-                                          <th>Cantidad</th>
-                                          <th></th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <tr>
-                                          <td>
-                                              <img class="img-fluid" src="./public/img/guitarra_02.jpg" alt="imagen guitarra" />
-                                          </td>
-                                          <td>SRV</td>
-                                          <td class="fw-bold">
-                                                  $299
-                                          </td>
-                                          <td class="flex align-items-start gap-4">
-                                              <button
-                                                  type="button"
-                                                  class="btn btn-dark"
-                                              >
-                                                  -
-                                              </button>
-                                                  1
-                                              <button
-                                                  type="button"
-                                                  class="btn btn-dark"
-                                              >
-                                                  +
-                                              </button>
-                                          </td>
-                                          <td>
-                                              <button
-                                                  class="btn btn-danger"
-                                                  type="button"
-                                              >
-                                                  X
-                                              </button>
-                                          </td>
-                                      </tr>
-                                  </tbody>
-                              </table>
+      saveLocalStorage()
+  }
 
-                              <p class="text-end">Total pagar: <span class="fw-bold">$899</span></p>
-                              <button class="btn btn-dark w-100 mt-3 p-2">Vaciar Carrito</button>
-                          </div>
-                      </div>
-                  </nav>
-              </div>
-          </div>
-      </header>
+
+
+  function removeFromCart(id){
+    console.log(`Eliminando articulo ID  ${id}`)
+    setCart( prevCart => prevCart.filter (album => album.id !== id) )  //basicamente settear el cart con todos los albumes que no tengan el id del que eliminamos pulsando la cruz roja
+  }
+
+
+  function increaseQuantity(id){
+    console.log("se ha añadido una unidad al articulo", id)
+    
+    const updatedCart=cart.map( item => {  //accedo a cada item del carrito. Map creara otro array que se guardara en updatedCart
+
+      if(item.id===id){
+        return{      //llaves pq se esta devolviendo un objeto con todas las propiedades del item album pero cambiando el valor de quantity
+          ...item,  
+          quantity:item.quantity+1
+        }
+      }
+      return item //si no cumple el if, devuelve el item SIN cambios
+    })
+    setCart(updatedCart)
+  }
+
+  function decreaseQuantity(id){
+    console.log("Se ha decrementado la cantidad del articulo", id)
+    const updatedCart=cart.map(item=> {
+        if(item.id===id && item.quantity>1){
+          return{
+            ...item,
+            quantity:item.quantity-1
+          }
+        }
+        return item
+    })
+    setCart(updatedCart)
+  }
+
+
+  function clearCart(){
+    setCart([])
+    console.log("Se ha vaciado el carrito")
+  }
+
+
+  function saveLocalStorage(){
+    localStorage.setItem('cart', JSON.stringify(cart))  //localstorage no puede almacenar arrays asi q lo convierto a string
+  }
 
 
 
 
 
+  return (
+    <>  {/* esto es un FRAGMENT de react en el que se pone todo el JSX*/}
+      
+      {/*pongo el componente Header en el que Header.jsx esta todo el codigo*/}
+        
+      <Header 
+        //props
+        cart={cart}
+        removeFromCart={removeFromCart}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
+        clearCart={clearCart}
+      />  
 
 
+      <main className="container-xl mt-5">
+          <h2 className="text-center">Vinyl records for sale</h2>
 
+          <div className="row mt-5"> {/*para q se vea en grid*/}
 
-
-      <main class="container-xl mt-5">
-          <h2 class="text-center">Vinyl records for sale</h2>
-
-          <div className="row mt-5">
-
-
-          {/* Tarjeta de Álbum */}
-          <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Reckless (1984 reissue)</h2>
-                  <h3 className="album-artist">By Bryan Adams</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/reckless_09.jpg" alt="Reckless album" style={{ width: "200px"}}
-/>
-                  <div className="card-body mt-3">
-                    <p>"Reckless" is a melodic rock album that channels high energy and unrestrained emotion. Its songs capture the thrill of youth, boldness, and living without limits, blending powerful guitar riffs and heartfelt lyrics.</p>
-                    <p className="fw-bold text-primary fs-4">$19.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-
-          
-          <div className="col-md-6 col-lg-4 my-4">
-            <div className="card h-100 text-center">
-              <h2 className="fs-3 fw-bold text-uppercase mt-3">Fearless (Taylor's Version)</h2>
-              <h3 className="album-artist">By Taylor Swift</h3> 
-              <img className="d-block mx-auto mb-3" src="./public/img/fearless_02.png" alt="Fearless album" style={{ width: "200px"}}/>
+            {/* Tarjeta de Álbum. El codigo entre {} es de JS */}
+            {
+              data.map((album) => (// el map nos va a generar un nuevo array y hay que devolverlo. Siempre devuelve un return que aqui va implicito. Accedo a cada objeto (album) del array
+                   <Album    //muestro cada album 9 veces pq hay 9 componentes en el array. Album es el componente hijo aqui
+                    key={album.id}  //esto lo indica react
+                    album={album}   //le paso a cada componente Album un prop album que contiene un objeto con toda la info de cada album
+                    cart={cart}
+                    setCart={setCart}
+                    addToCart={addToCart}
+                   /> 
+                ))//accedo asi a data que es un state y con map comienzo a iterar y generar un componente (un album) por cada elemento de ese array
               
-              
-              <div className="card-body mt-3">
-                <p>The re-recording of Fearless captures the feelings of nostalgia, young love, and memories of your hometown. With country and heartfelt melodies, the album tells stories of chasing dreams and letting some things behind.</p>
-                <p className="fw-bold text-primary fs-4">$29.99</p>
-                <button type="button" className="btn btn-dark w-100">Add to cart</button>
-              </div>
-            </div>
+                //esta siguiente lleva cierra el codigo JS:
+            } 
+  
           </div>
-
-          
-
-              <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">First Two Pages of Frankenstein</h2>
-                  <h3 className="album-artist">By The National</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/firsttwo_03.jpg" alt="First Two Pages of Frankenstein album" style={{ width: "200px"}}/>
-                  <div className="card-body mt-3">
-                    <p>"First Two Pages of Frankenstein" blends The National's melancholic indie rock with introspective lyrics, exploring memory, solitude, and emotional fragility through rich, atmospheric instrumentation.</p>
-                    <p className="fw-bold text-primary fs-4">$21.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-              <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Plastic Hearts</h2>
-                  <h3 className="album-artist">By Miley Cyrus</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/plastic_04.jpg" alt="Plastic Hearts album" style={{ width: "200px"}}/>
-                  <div className="card-body mt-3">
-                    <p>"Plastic Hearts" delivers raw rock with powerful guitar riffs and gritty vocals. It channels heartbreak and unbridled spirit, capturing the record's wild energy and fearless attitude of constant reinvention and self-expression.</p>
-                    <p className="fw-bold text-primary fs-4">$35.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-              <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Zach Bryan</h2>
-                  <h3 className="album-artist">By Zach Bryan</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/zach_05.jpg" alt="Zach Bryan 2023 album" style={{ width: "200px"}}/>
-                  <div className="card-body mt-3">
-                    <p>"Zach Bryan" is a melodic country album that tells stories of love, loss, and life’s struggles. Its music blends gentle melodies with emotional lyrics, creating a reflective and moving listening experience.</p>
-                    <p className="fw-bold text-primary fs-4">$19.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-              <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Mira Dentro</h2>
-                  <h3 className="album-artist">By Maldita Nerea</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/mira_06.jpg" alt="Mira album" style={{ width: "200px"}} />
-                  <div className="card-body mt-3">
-                    <p>"Mira Dentro" is a pop-rock album that explores themes of love and endless hope. Its melodies are uplifting and heartfelt, reflecting the Spanish band’s signature energetic and emotional style.</p>
-                    <p className="fw-bold text-primary fs-4">$16.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-
-            <div className="col-md-6 col-lg-4 my-4">
-            <div className="card h-100 text-center">
-              <h2 className="fs-3 fw-bold text-uppercase mt-3">Swimming</h2>   {/*fs-2 es fontsize 2, mas grande*/}
-              <h3 className="album-artist">By Mac Miller</h3>
-
-              <img className="d-block mx-auto mb-3" src="./public/img/swimming_01.png" alt="album" style={{ width: "200px"}}/>
-              
-              <div className="card-body mt-3">
-                <p>Swimming" is Mac Miller’s fifth studio album. It explores themes of self-reflection, growth, and struggle. It blends hip-hop, jazz, and soul influences, capturing his journey through life, love, and mental health.</p>
-                <p className="fw-bold text-primary fs-4">$49.99</p>
-                <button type="button" className="btn btn-dark w-100">Add to cart</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Evermore</h2>
-                  <h3 className="album-artist">By Taylor Swift</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/evermore_07.jpg" alt="Evermore album" style={{ width: "200px"}}/>
-                  <div className="card-body mt-3">
-                    <p>"Evermore" is a folk and alternative album that reflects on the impermanence of life and nostalgia. Its sound captures moments of sadness, but with the hope that neither the good nor the bad lasts forever.</p>
-                    <p className="fw-bold text-primary fs-4">$39.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>
-
-
-              <div className="col-md-6 col-lg-4 my-4">
-                <div className="card h-100 text-center">
-                  <h2 className="fs-3 fw-bold text-uppercase mt-3">Dawn FM</h2>
-                  <h3 className="album-artist">By The Weeknd</h3> 
-                  <img className="d-block mx-auto mb-3" src="./public/img/dawn_08.jpg" alt="Dawn FM album" style={{ width: "200px"}}/>
-                  <div className="card-body mt-3">
-                    <p>This synth-electronic album guides listeners through reflection on life, regrets, and acceptance. Its immersive production conveys a surreal journey toward light and resolution.</p>
-                    <p className="fw-bold text-primary fs-4">$13.99</p>
-                    <button type="button" className="btn btn-dark w-100">Add to cart</button>
-                  </div>
-                </div>
-              </div>    
-              </div>
         
       </main>
 
 
-      <footer class="bg-dark mt-5 py-5">
-          <div class="container-xl">
-              <p class="text-white text-center fs-4 mt-4 m-md-0">GuitarLA - Todos los derechos Reservados</p>
+      <footer className="bg-dark mt-5 py-5">
+          <div className="container-xl">
+              <p className="text-white text-center fs-4 mt-4 m-md-0">Golden Record - All rights reserved</p>
           </div>
       </footer>
 

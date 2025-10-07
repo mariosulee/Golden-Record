@@ -159,7 +159,7 @@ body {
   font-family: "Outfit", sans-serif;
   font-weight: 900;
   line-height: 1.2;
-  color: #ffb22c;
+  color: #e99401;
 }
 
 h1, .h1 {
@@ -755,8 +755,6 @@ button:not(:disabled),
 }
 .header {
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../img/header.jpg");
-  /** TODO: Eliminar la sig linea **/
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../public/img/header.jpg");
   background-position: 50%;
   background-size: cover;
   position: relative;
@@ -777,6 +775,7 @@ button:not(:disabled),
     z-index: 10;
   }
 }
+
 .album-artist {
   font-weight: 400;
   font-size: 0.93rem; /* ajusta a lo que quieras */

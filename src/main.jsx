@@ -9,4 +9,4 @@ createRoot(document.getElementById('root')).render(  //busca root y monta toda l
   </StrictMode>,
 )
 
-//App es la funcion donde se monta toda la aplicacion de React en App.jsx
+//App es el componente donde se monta toda la aplicacion de React en App.jsx

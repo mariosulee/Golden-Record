@@ -96,6 +96,10 @@ function App() {  //recordar q la funcion App es un componente de react
 
 
 
+
+
+
+
   return (
     <>  {/* esto es un FRAGMENT de react en el que se pone todo el JSX*/}
       
@@ -138,7 +142,9 @@ function App() {  //recordar q la funcion App es un componente de react
 
       <footer className="bg-dark mt-5 py-5">
           <div className="container-xl">
-              <p className="text-white text-center fs-4 mt-4 m-md-0">Golden Record - All rights reserved</p>
+            <p className="text-white text-center fs-4 mt-4 m-md-0">
+              Golden Record - Mario Sulé Domínguez. All rights reserved © 2025
+            </p>
           </div>
       </footer>
 

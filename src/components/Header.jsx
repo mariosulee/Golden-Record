@@ -36,10 +36,10 @@ function Header( {cart, removeFromCart, increaseQuantity, decreaseQuantity, clea
                                 <table className="w-100 table">
                                   <thead>
                                       <tr>
-                                          <th>Imagen</th>
-                                          <th>Nombre</th>
-                                          <th>Precio</th>
-                                          <th>Cantidad</th>
+                                          <th>Image</th>
+                                          <th>Title</th>
+                                          <th>Price</th>
+                                          <th>Quantity</th>
                                           <th></th>
                                       </tr>
                                   </thead>
@@ -90,11 +90,11 @@ function Header( {cart, removeFromCart, increaseQuantity, decreaseQuantity, clea
                               </table>
 
                 
-                              <p className="text-end">Total pagar: <span className="fw-bold">{cartTotal().toFixed(2)}€</span></p>  
+                              <p className="text-end">Total to pay: <span className="fw-bold">{cartTotal().toFixed(2)}€</span></p>  
                               <button 
                               className="btn btn-dark w-100 mt-3 p-2"
                               onClick={clearCart}
-                              >Vaciar Carrito
+                              >Empty Cart
                               </button>
                           </>
                           )}

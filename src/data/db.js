@@ -33,11 +33,10 @@ export const db = [  //este es un ARRAY DE OBJETOS con 8 albumes representados p
 
   {
     id: 3,
-    title: "Plastic Hearts",
-    artist: "Miley Cyrus",
+    title: "Forever Ago",
+    artist: "Bon Iver",
     image: "/img/plastic_04.jpg",
-    description:
-      '"Plastic Hearts" delivers raw rock with powerful guitar riffs and gritty vocals. It channels heartbreak and unbridled spirit, capturing the record\'s wild energy and fearless attitude of constant reinvention and self-expression.',
+    description: "For Emma, Forever Ago is the hauntingly beautiful debut album by Bon Iver, written and recorded in isolation in a forest cabin. Blending fragile folk with raw emotion, it reflects a period of heartbreak and solitude.",
     price: 35.99,
   },
 
